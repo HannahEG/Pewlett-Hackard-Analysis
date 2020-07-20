@@ -137,7 +137,7 @@ FROM current_emp as ce
 		ON (de.dept_no = d.dept_no);
 
 SELECT * FROM dept_INFO;
-select * from emp_info;
+select * from emp_info;-- row count 33118
 select * from retirement_info;
 select * from manager_info;
 select * from titles;
@@ -165,8 +165,28 @@ SELECT	ei.emp_no,
 		ts.title,
 		ts.from_date,
 		ei.salary
---INTO titles_delivarable_1
+INTO titles_deliverable_1
 FROM emp_info as ei
 	INNER JOIN titles as ts
 		ON (ei.emp_no = ts.emp_no); --54722 count rows
+
+-- Remove duplicate title entries/keep most recent from_dates
+SELECT 	emp_no, 
+		first_name, 
+		last_name, 
+		title, 
+		from_date
+INTO titles_deliverable_refined
+FROM 
+	(SELECT emp_no, first_name, last_name, title, from_date,
+	 ROW_NUMBER() OVER
+	 (PARTITION BY (emp_no) 
+	  ORDER BY from_date DESC) rn
+	 FROM titles_deliverable_1)
+	 tmp WHERE rn = 1
+ ORDER BY emp_no;
+	 
+SELECT * FROM titles_deliverable_refined
+ORDER BY emp_no; --row count 33118
+
 
