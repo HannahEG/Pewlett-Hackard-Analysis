@@ -175,10 +175,11 @@ SELECT 	emp_no,
 		first_name, 
 		last_name, 
 		title, 
-		from_date
+		from_date,
+		salary
 INTO titles_deliverable_refined
 FROM 
-	(SELECT emp_no, first_name, last_name, title, from_date,
+	(SELECT emp_no, first_name, last_name, title, from_date, salary,
 	 ROW_NUMBER() OVER
 	 (PARTITION BY (emp_no) 
 	  ORDER BY from_date DESC) rn
