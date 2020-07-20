@@ -190,4 +190,36 @@ FROM
 SELECT * FROM titles_deliverable_refined
 ORDER BY emp_no; --row count 33118
 
+-- Mentorship eligibility table
+SELECT 	e.emp_no,
+		e.first_name,
+		e.last_name,
+		ts.title,
+		ts.from_date,
+		ts.to_date
+INTO mentorship_eligibility
+FROM employees as e
+	INNER JOIN titles as ts
+ON e.emp_no = ts.emp_no
+WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31');
 
+select * from mentorship_eligibility;
+
+--Remove duplicates from mentorship eligibility
+SELECT 	emp_no, 
+		first_name, 
+		last_name, 
+		title, 
+		from_date,
+		to_date
+INTO mentorship_eligibility_refined
+FROM 
+	(SELECT emp_no, first_name, last_name, title, from_date, to_date,
+	 ROW_NUMBER() OVER
+	 (PARTITION BY (emp_no) 
+	  ORDER BY from_date DESC) rn
+	 FROM mentorship_eligibility)
+	 tmp WHERE rn = 1
+ ORDER BY emp_no;
+	 
+SELECT * FROM mentorship_eligibility_refined;
