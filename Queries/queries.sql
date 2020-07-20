@@ -1,3 +1,7 @@
+--MODULE 7 LESSON & CHALLENGE CODE
+--(challenge 7 code labeled below:)
+
+
 --employees from 1952-1955
 SELECT first_name, last_name
 FROM employees
@@ -146,17 +150,28 @@ select * from titles;
 SELECT * FROM dept_info
 WHERE dept_name IN('Sales', 'Development');
 
---CHALLENGE MODULE 7
--- Retiring employees count/grouped by title
+
+
+
+
+--CHALLENGE 7 CODE
+-- Retiring employees count/grouped by title (BEFORE DUPLICATES)
 SELECT COUNT(ce.emp_no), ts.title
-INTO title_retire
+--INTO title_retire
 FROM current_emp as ce
 LEFT JOIN titles as ts
 ON ce.emp_no = ts.emp_no
 GROUP BY ts.title
 ORDER BY ts.title;
 
-SELECT * FROM title_retire; --row count 54722
+SELECT * FROM title_retire; --total count 54722
+
+--retiring titles query for AFTER DUPLICATES removed
+SELECT COUNT (emp_no), title
+FROM titles_deliverable_refined
+GROUP BY title
+ORDER BY title; -- total count 33118
+
 
 -- Retiring employees table with no, names, titles, from dates, salaries: Deliverable 1
 SELECT	ei.emp_no,
@@ -203,7 +218,7 @@ FROM employees as e
 ON e.emp_no = ts.emp_no
 WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31');
 
-select * from mentorship_eligibility;
+select * from mentorship_eligibility; --2846 row count
 
 --Remove duplicates from mentorship eligibility
 SELECT 	emp_no, 
@@ -222,11 +237,15 @@ FROM
 	 tmp WHERE rn = 1
  ORDER BY emp_no;
  
---count number of mentorship eligible employees	 --1940 eligible
+ select * from mentorship_eligibility_refined; --1940 row count
+ 
+ 
+--COUNTS:
+--number of mentorship eligible employees	 --1940 eligible
 SELECT COUNT (emp_no)
 FROM mentorship_eligibility_refined;
 
---count number of retiring employees --41380 retiring
+--number of retiring employees --41380 retiring
 SELECT COUNT(first_name)
 FROM employees
 WHERE (birth_date BETWEEN '1952-01-01' AND '1955-12-31')
