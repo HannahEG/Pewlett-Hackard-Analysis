@@ -33,7 +33,7 @@ AND (hire_date BETWEEN '1985-01-01' AND '1988-12-31');
 SELECT COUNT(first_name)
 FROM employees
 WHERE (birth_date BETWEEN '1952-01-01' AND '1955-12-31')
-AND (hire_date BETWEEN '1985-01-01' AND '1988-12-31');
+AND (hire_date BETWEEN '1985-01-01' AND '1988-12-31'); --41380 retiring
 
 --create table for retirement eligible employees
 SELECT emp_no, first_name, last_name
@@ -146,7 +146,7 @@ select * from titles;
 SELECT * FROM dept_info
 WHERE dept_name IN('Sales', 'Development');
 
-
+--CHALLENGE MODULE 7
 -- Retiring employees count/grouped by title
 SELECT COUNT(ce.emp_no), ts.title
 INTO title_retire
@@ -221,5 +221,14 @@ FROM
 	 FROM mentorship_eligibility)
 	 tmp WHERE rn = 1
  ORDER BY emp_no;
-	 
-SELECT * FROM mentorship_eligibility_refined;
+ 
+--count number of mentorship eligible employees	 --1940 eligible
+SELECT COUNT (emp_no)
+FROM mentorship_eligibility_refined;
+
+--count number of retiring employees --41380 retiring
+SELECT COUNT(first_name)
+FROM employees
+WHERE (birth_date BETWEEN '1952-01-01' AND '1955-12-31')
+AND (hire_date BETWEEN '1985-01-01' AND '1988-12-31'); 
+
