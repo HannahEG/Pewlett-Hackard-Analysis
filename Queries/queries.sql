@@ -44,24 +44,129 @@ AND (hire_date BETWEEN '1985-01-01' AND '1988-12-31');
 --check table
 SELECT * FROM retirement_info;
 
-DROP TABLE retirement_info;
+--DROP TABLE retirement_info;
 
 
 -- Joining departments and dept_manager tables
-SELECT departments.dept_name,
-	dept_manager.emp_no,
-	dept_manager.from_date,
-	dept_managet.to_date,
-FROM departments
-INNER JOIN dept_manager
-ON departments.dept_no = dept_manager.dept_no;
-
+SELECT d.dept_name,
+	dm.emp_no,
+	dm.from_date,
+	dm.to_date
+FROM departments as d
+INNER JOIN dept_manager as dm
+ON d.dept_no = dm.dept_no;
 
 -- Joining retirement_info and dept_emp tables
-SELECT retirements_info.emp_no,
-	retirement_info.first_name,
-	retirement_info.last_name,
-	dept_emp.to_date
-FROM retirement_info
-LEFT JOIN dept_emp
-ON retirement_info.emp_no = dept_emp.no;
+SELECT ri.emp_no,
+	ri.first_name,
+	ri.last_name,
+	de.to_date
+FROM retirement_info as ri
+LEFT JOIN dept_emp as de
+ON ri.emp_no = de.emp_no;
+
+-- Joining tables and creating new table for retirement eligibility
+SELECT ri.emp_no,
+	ri.first_name,
+	ri.last_name,
+	de.to_date
+INTO current_emp
+FROM retirement_info as ri
+LEFT JOIN dept_emp as de
+ON ri.emp_no = de.emp_no
+WHERE de.to_date = ('9999-01-01');
+
+SELECT * FROM current_emp;
+
+-- Employee count by department number 
+SELECT COUNT(ce.emp_no), de.dept_no
+INTO dept_retire
+FROM current_emp as ce
+LEFT JOIN dept_emp as de
+ON ce.emp_no = de.emp_no
+GROUP BY de.dept_no
+ORDER BY de.dept_no;
+
+SELECT * FROM dept_retire;
+
+SELECT * FROM salaries
+ORDER BY to_date DESC;
+
+--create table for employees including gender and hire date
+SELECT e.emp_no, 
+	e.first_name, 
+	e.last_name,
+	e.gender,
+	s.salary,
+	de.to_date
+INTO emp_info
+FROM employees as e
+INNER JOIN salaries as s
+ON (e.emp_no = s.emp_no)
+INNER JOIN dept_emp as de
+ON (e.emp_no = de.emp_no)
+WHERE (e.birth_date BETWEEN '1952-01-01' AND '1955-12-31')
+AND (e.hire_date BETWEEN '1985-01-01' AND '1988-12-31')
+AND (de.to_date = '9999-01-01');
+
+-- List of managers per department
+SELECT 	dm.dept_no,
+		d.dept_name,
+		dm.emp_no,
+		ce.last_name,
+		ce.first_name,
+		dm.from_date,
+		dm.to_date
+INTO manager_info
+FROM dept_manager as dm
+	INNER JOIN departments as d
+		ON (dm.dept_no = d.dept_no)
+	INNER JOIN current_emp as ce
+		ON (dm.emp_no = ce.emp_no);
+		
+-- Retiring employees by department
+SELECT	ce.emp_no,
+		ce.first_name,
+		ce.last_name,
+		d.dept_name
+INTO dept_info
+FROM current_emp as ce
+	INNER JOIN dept_emp as de
+		ON (ce.emp_no = de.emp_no)
+	INNER JOIN departments as d
+		ON (de.dept_no = d.dept_no);
+
+SELECT * FROM dept_INFO;
+select * from emp_info;
+select * from retirement_info;
+select * from manager_info;
+select * from titles;
+
+-- List query for sale department info
+SELECT * FROM dept_info
+WHERE dept_name IN('Sales', 'Development');
+
+
+-- Retiring employees count/grouped by title
+SELECT COUNT(ce.emp_no), ts.title
+INTO title_retire
+FROM current_emp as ce
+LEFT JOIN titles as ts
+ON ce.emp_no = ts.emp_no
+GROUP BY ts.title
+ORDER BY ts.title;
+
+SELECT * FROM title_retire; --row count 54722
+
+-- Retiring employees table with no, names, titles, from dates, salaries: Deliverable 1
+SELECT	ei.emp_no,
+		ei.first_name,
+		ei.last_name,
+		ts.title,
+		ts.from_date,
+		ei.salary
+--INTO titles_delivarable_1
+FROM emp_info as ei
+	INNER JOIN titles as ts
+		ON (ei.emp_no = ts.emp_no); --54722 count rows
+
